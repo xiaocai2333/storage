@@ -3,25 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/minio/minio-go/v7"
-	"github.com/minio/minio-go/v7/pkg/credentials"
-	"io"
-	"os"
-
-	//. "test-minio/storage"
-	//"test-minio/storage/minio"
-	//. "test-minio/storage/minio/minio"
-	//"time"
+	"test-minio/storage/minio"
 )
-
-type Reader interface {
-	Read(p []byte) (n int, err error)
-}
-
-type LimitedReader struct {
-	R Reader // underlying reader
-	N int64  // max bytes remaining
-}
 
 func main() {
 	endpoint := "play.min.io"
@@ -29,42 +12,44 @@ func main() {
 	secretAccessKey := "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG"
 	useSSL := true
 	ctx := context.Background()
-	//client, err := minio.Init(endpoint, accessKeyID, secretAccessKey, useSSL)
-	//
-	//if err != nil {
-	//	panic(err.Error())
-	//}
-	//
-	//key := Key("milvus")
-	//timestamp := time.Now().Unix()
-	//client.Get(ctx, key, timestamp)
 
-	minioClient, err := minio.New(endpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
-		Secure: useSSL,
-	})
+	//初始化minio
+	client, err := minio.New(endpoint, accessKeyID, secretAccessKey, useSSL)
 
 	if err != nil {
-		panic(err.Error())
-		fmt.Println("hahahaha")
-		return
-	}
-
-	bucketName := "zcbucket"
-	objectName := "bar11"
-
-	object, err := minioClient.GetObject(ctx, bucketName, objectName, minio.GetObjectOptions{})
-	fmt.Println("value = ")
-	fmt.Println(object.Stat())
-	localFile, err := os.Create("/tmp/local-file.txt")
-
-	size := 256 * 1024
-	buf := make([]byte, size)
-	n, err := object.Read(buf)
-	fmt.Println("n = ", n)
-	fmt.Println("buf = ", buf[:n])
-	if _, err = io.Copy(localFile, object); err != nil{
 		fmt.Println(err)
-		return
 	}
+
+	//put对象
+	key := []byte("letter")
+
+	err = client.Set(ctx, key, []byte("abcdefghijklmnoopqrstuvwxyz"), 1234567)
+	fmt.Println(err)
+	err = client.Set(ctx, []byte("letterr"), []byte("asjkfghkusguisdhjfbsukdfhhjskxjf"), 1234667)
+	fmt.Println(err)
+	err = client.Set(ctx, key, []byte("123472146716490asjfugasf"), 1234767)
+	fmt.Println(err)
+
+
+	//读取对象
+	objectName := "letter"
+	key = []byte(objectName)
+	object, _ := client.Get(ctx, key, 1234680)
+	fmt.Println(string(object))
+	object, _ = client.Get(ctx, key, 1234567)
+	fmt.Println(string(object))
+	object, _ = client.Get(ctx, key, 1234800)
+	fmt.Println(string(object))
+	object, _ = client.Get(ctx, []byte("letterr"), 1234667)
+	fmt.Println(string(object))
+
+	//删除对象
+	err = client.Delete(ctx, key, 1234700)
+	fmt.Println(err)
+	object, _ = client.Get(ctx, key, 1234700)
+	fmt.Println(string(object))
+	object, _ = client.Get(ctx, key, 1234800)
+	fmt.Println(string(object))
+
+	return
 }

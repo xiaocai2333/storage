@@ -3,15 +3,15 @@ package codec
 import (
 	"encoding/binary"
 	"errors"
+	"fmt"
 	"github.com/tikv/client-go/codec"
 )
 
 // MvccEncode returns the encoded key.
-func MvccEncode(key []byte, ts uint64) []byte {
+func MvccEncode(key []byte, ts uint64) string {
 	//TODO: should we encode key to memory comparable
-	b := codec.EncodeBytes(key)
-	ret := codec.EncodeUintDesc(b, ts)
-	return ret
+	formatTS := fmt.Sprintf("%0#16x", ^ts)
+	return string(key) + "_" + formatTS
 }
 
 func MvccDecode(b []byte) ([]byte, uint64, error) {
