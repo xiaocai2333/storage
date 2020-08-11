@@ -2,12 +2,12 @@ package minio
 
 import (
 	"bytes"
-	"io"
-	"strings"
 	"context"
 	"fmt"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
+	"io"
+	"strings"
 	. "test-minio/storage"
 	"test-minio/storage/codec"
 )
@@ -42,7 +42,9 @@ func (s *minioStore) Get(ctx context.Context, key Key, timestamp uint64) (Value,
 			fmt.Println(objectInfo.Err)
 			return nil, objectInfo.Err
 		}
+
 		splitKey := strings.Split(objectInfo.Key, "_")
+
 		if string(key) == strings.Join(splitKey[:len(splitKey)-1], "_") {
 			if minioKey <= objectInfo.Key {
 				object, err := s.client.GetObject(ctx, bucketName, objectInfo.Key, minio.GetObjectOptions{})
@@ -50,6 +52,7 @@ func (s *minioStore) Get(ctx context.Context, key Key, timestamp uint64) (Value,
 					fmt.Println(err)
 					return nil, err
 				}
+
 				size := 256 * 1024
 				buf := make([]byte, size)
 				n, err := object.Read(buf)
@@ -57,6 +60,7 @@ func (s *minioStore) Get(ctx context.Context, key Key, timestamp uint64) (Value,
 					fmt.Println(err)
 					return nil, err
 				}
+
 				return buf[:n], err
 			}
 		}
@@ -80,6 +84,7 @@ func (s *minioStore) BatchGet(ctx context.Context, keys []Key, timestamp uint64)
 			errs = append(errs, nil)
 		}
 	}
+
 	return values, errs
 }
 
@@ -88,20 +93,24 @@ func (s *minioStore) Set(ctx context.Context, key Key, v Value, timestamp uint64
 
 	reader := bytes.NewReader(v)
 	uploadInfo, err := s.client.PutObject(ctx, bucketName, minioKey, reader, int64(len(v)), minio.PutObjectOptions{})
+
 	if err != nil {
 		return err
 	}
+
 	fmt.Println(uploadInfo)
 	return err
 }
 
 func (s *minioStore) BatchSet(ctx context.Context, keys []Key, values []Value, timestamp uint64) error {
+
 	for i := 0; i < len(keys); i++ {
 		err := s.Set(ctx, keys[i], values[i], timestamp)
 		if err != nil {
 			return err
 		}
 	}
+
 	return nil
 }
 
@@ -109,6 +118,7 @@ func (s *minioStore) Delete(ctx context.Context, key Key, timestamp uint64) erro
 	minioKey := codec.MvccEncode(key, timestamp)
 
 	objects := s.client.ListObjects(ctx, bucketName, minio.ListObjectsOptions{Prefix: string(key)})
+
 	for objectInfo := range objects {
 		if objectInfo.Err != nil {
 			fmt.Println(objectInfo.Err)
@@ -130,6 +140,7 @@ func (s *minioStore) Delete(ctx context.Context, key Key, timestamp uint64) erro
 }
 
 func (s *minioStore) BatchDelete(ctx context.Context, keys []Key, timestamp uint64) error {
+
 	for i := 0; i < len(keys); i++ {
 		err := s.Delete(ctx, keys[i], timestamp)
 		if err != nil {
@@ -137,6 +148,7 @@ func (s *minioStore) BatchDelete(ctx context.Context, keys []Key, timestamp uint
 			return err
 		}
 	}
+
 	return nil
 }
 
