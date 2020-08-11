@@ -75,7 +75,7 @@ func (s *minioStore) BatchGet(ctx context.Context, keys []Key, timestamp uint64)
 
 	for i := 0; i < len(keys); i++ {
 		object, err := s.Get(ctx, keys[i], timestamp)
-		if err != nil {
+		if err != nil && err != io.EOF {
 			fmt.Println(err)
 			values = append(values, nil)
 			errs = append(errs, err)

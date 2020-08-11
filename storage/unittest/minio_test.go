@@ -14,7 +14,7 @@ var useSSL = true
 var ctx = context.Background()
 var client, err = minio.New(endpoint, accessKeyID, secretAccessKey, useSSL)
 
-func TestPut(t *testing.T) {
+func TestSet(t *testing.T) {
 	err = client.Set(ctx, []byte("bar"), []byte("abcdefghijklmnoopqrstuvwxyz"), 1234567)
 	assert.Nil(t, err)
 	err = client.Set(ctx, []byte("bar"), []byte("djhfkjsbdfbsdughorsgsdjhgoisdgh"), 1235567)
@@ -42,5 +42,27 @@ func TestDelete(t *testing.T){
 	object, _ := client.Get(ctx, []byte("bar"), 1237000)
 	assert.Nil(t, object)
 	err = client.Delete(ctx, []byte("bar_1"), 1237000)
+	assert.Nil(t, err)
+}
+
+func TestBatchSet(t *testing.T){
+	keys := [][]byte{[]byte("foo"), []byte("bar")}
+	values := [][]byte{[]byte("The key is foo!"), []byte("The key is bar!")}
+	err = client.BatchSet(ctx, keys, values, 555555)
+	assert.Nil(t, err)
+}
+
+func TestBatchGet(t *testing.T){
+	keys := [][]byte{[]byte("foo"), []byte("bar")}
+	objects, errs := client.BatchGet(ctx, keys, 666666)
+	assert.Nil(t, errs[0])
+	assert.Nil(t, errs[1])
+	assert.Equal(t, "The key is foo!", string(objects[0]))
+	assert.Equal(t, "The key is bar!", string(objects[1]))
+}
+
+func TestBatchDelete(t *testing.T){
+	keys := [][]byte{[]byte("foo"), []byte("bar")}
+	err := client.BatchDelete(ctx, keys, 666666)
 	assert.Nil(t, err)
 }
