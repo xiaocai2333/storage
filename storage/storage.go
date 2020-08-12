@@ -12,6 +12,4 @@ type Store interface {
 	BatchSet(ctx context.Context, keys []Key, v []Value, timestamp uint64) error
 	Delete(ctx context.Context, key Key, timestamp uint64) error
 	BatchDelete(ctx context.Context, keys []Key, timestamp uint64) error
-	Scan(ctx context.Context, start Key, end Key, limit uint32, timestamp uint64) ([]Key, []Value, error)
-	ReverseScan(ctx context.Context, start Key, end Key, limit uint32, timestamp uint64) ([]Key, []Value, error)
 }

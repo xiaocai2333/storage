@@ -7,12 +7,16 @@ import (
 	"testing"
 )
 
-var endpoint = "play.min.io"
-var accessKeyID = "Q3AM3UQ867SPQQA43P2F"
-var secretAccessKey = "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG"
-var useSSL = true
+//var endpoint = "play.min.io"
+//var accessKeyID = "Q3AM3UQ867SPQQA43P2F"
+//var secretAccessKey = "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG"
+//var useSSL = true
+var endPoint = "127.0.0.1:9000"
+var accessKeyID = "testminio"
+var secretAccessKey = "testminio"
+var useSSL = false
 var ctx = context.Background()
-var client, err = minio.New(endpoint, accessKeyID, secretAccessKey, useSSL)
+var client, err = minio.New(endPoint, accessKeyID, secretAccessKey, useSSL)
 
 func TestSet(t *testing.T) {
 	err = client.Set(ctx, []byte("bar"), []byte("abcdefghijklmnoopqrstuvwxyz"), 1234567)
@@ -54,9 +58,8 @@ func TestBatchSet(t *testing.T){
 
 func TestBatchGet(t *testing.T){
 	keys := [][]byte{[]byte("foo"), []byte("bar")}
-	objects, errs := client.BatchGet(ctx, keys, 666666)
-	assert.Nil(t, errs[0])
-	assert.Nil(t, errs[1])
+	objects, err := client.BatchGet(ctx, keys, 666666)
+	assert.Nil(t, err)
 	assert.Equal(t, "The key is foo!", string(objects[0]))
 	assert.Equal(t, "The key is bar!", string(objects[1]))
 }

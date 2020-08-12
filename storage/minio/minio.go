@@ -12,6 +12,7 @@ import (
 	"test-minio/storage/codec"
 )
 
+//TODO: How to define bucketName?
 var bucketName = "zcbucket"
 
 type minioStore struct {
@@ -34,58 +35,46 @@ func New(endpoint string, accessKeyID string, secretAccessKey string, useSSL boo
 }
 
 func (s *minioStore) Get(ctx context.Context, key Key, timestamp uint64) (Value, error) {
-	minioKey := codec.MvccEncode(key, timestamp)
 
-	objects := s.client.ListObjects(ctx, bucketName, minio.ListObjectsOptions{Prefix: string(key)})
-	for objectInfo := range objects {
+	for objectInfo := range s.listObjectsKeys(ctx, key, timestamp){
 		if objectInfo.Err != nil {
 			fmt.Println(objectInfo.Err)
 			return nil, objectInfo.Err
 		}
+		object, err := s.client.GetObject(ctx, bucketName, objectInfo.Key, minio.GetObjectOptions{})
 
-		splitKey := strings.Split(objectInfo.Key, "_")
-
-		if string(key) == strings.Join(splitKey[:len(splitKey)-1], "_") {
-			if minioKey <= objectInfo.Key {
-				object, err := s.client.GetObject(ctx, bucketName, objectInfo.Key, minio.GetObjectOptions{})
-				if err != nil {
-					fmt.Println(err)
-					return nil, err
-				}
-
-				size := 256 * 1024
-				buf := make([]byte, size)
-				n, err := object.Read(buf)
-				if err != nil && err != io.EOF {
-					fmt.Println(err)
-					return nil, err
-				}
-
-				return buf[:n], err
-			}
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
 		}
+
+		buf := make([]byte, objectInfo.Size)
+		n, err := object.Read(buf)
+		if err != nil && err != io.EOF {
+			fmt.Println(err)
+			return nil, err
+		}
+		return buf[:n], err
 	}
 
 	return nil, nil
 }
 
-func (s *minioStore) BatchGet(ctx context.Context, keys []Key, timestamp uint64) ([]Value, []error) {
+func (s *minioStore) BatchGet(ctx context.Context, keys []Key, timestamp uint64) ([]Value, error) {
 	var values []Value
-	var errs []error
 
 	for i := 0; i < len(keys); i++ {
 		object, err := s.Get(ctx, keys[i], timestamp)
 		if err != nil && err != io.EOF {
 			fmt.Println(err)
 			values = append(values, nil)
-			errs = append(errs, err)
+			return nil, err
 		} else {
 			values = append(values, object)
-			errs = append(errs, nil)
 		}
 	}
 
-	return values, errs
+	return values, nil
 }
 
 func (s *minioStore) Set(ctx context.Context, key Key, v Value, timestamp uint64) error {
@@ -115,27 +104,24 @@ func (s *minioStore) BatchSet(ctx context.Context, keys []Key, values []Value, t
 }
 
 func (s *minioStore) Delete(ctx context.Context, key Key, timestamp uint64) error {
-	minioKey := codec.MvccEncode(key, timestamp)
+	objectsCh := make(chan minio.ObjectInfo)
 
-	objects := s.client.ListObjects(ctx, bucketName, minio.ListObjectsOptions{Prefix: string(key)})
+	go func() {
+		defer close(objectsCh)
+		for object := range s.listObjectsKeys(ctx, key, timestamp) {
+			objectsCh <- object
+		}
+	}()
 
-	for objectInfo := range objects {
-		if objectInfo.Err != nil {
-			fmt.Println(objectInfo.Err)
-			return objectInfo.Err
-		}
-		splitKey := strings.Split(objectInfo.Key, "_")
-		if string(key) == strings.Join(splitKey[:len(splitKey)-1], "_") {
-			if minioKey <= objectInfo.Key {
-				err := s.client.RemoveObject(ctx, bucketName, objectInfo.Key, minio.RemoveObjectOptions{})
-				if err != nil {
-					fmt.Println(err)
-					return err
-				}
-			}
-		}
+	opts := minio.RemoveObjectsOptions{
+		GovernanceBypass: true,
 	}
 
+	for rErr := range s.client.RemoveObjects(ctx, bucketName, objectsCh, opts) {
+		if rErr.Err != nil {
+			return rErr.Err
+		}
+	}
 	return nil
 }
 
@@ -152,10 +138,28 @@ func (s *minioStore) BatchDelete(ctx context.Context, keys []Key, timestamp uint
 	return nil
 }
 
-//func Scan(ctx context.Context, start Key, end Key, limit uint32, timestamp uint64) ([]Key, []Value, error) {
-//
-//}
-//
-//func ReverseScan(ctx context.Context, start Key, end Key, limit uint32, timestamp uint64) ([]Key, []Value, error) {
-//
-//}
+func (s *minioStore) listObjectsKeys(ctx context.Context, key Key, timestamp uint64) <-chan minio.ObjectInfo {
+	minioKey := codec.MvccEncode(key, timestamp)
+
+	objectsCh := make(chan minio.ObjectInfo)
+
+	go func() {
+		defer close(objectsCh)
+		for object := range s.client.ListObjects(ctx, bucketName, minio.ListObjectsOptions{Prefix: string(key)}){
+			if object.Err != nil {
+				fmt.Println(object.Err)
+				objectsCh <- minio.ObjectInfo{
+
+				}
+			}
+			splitKey := strings.Split(object.Key, "_")
+			if string(key) == strings.Join(splitKey[:len(splitKey)-1], "_") {
+				if minioKey <= object.Key {
+					objectsCh <- object
+				}
+			}
+		}
+	}()
+
+	return objectsCh
+}
