@@ -19,7 +19,7 @@ type minioStore struct {
 	client *minio.Client
 }
 
-func New(endpoint string, accessKeyID string, secretAccessKey string, useSSL bool) (*minioStore, error) {
+func New(ctx context.Context, endpoint string, accessKeyID string, secretAccessKey string, useSSL bool) (*minioStore, error) {
 
 	minioClient, err := minio.New(endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
@@ -29,6 +29,19 @@ func New(endpoint string, accessKeyID string, secretAccessKey string, useSSL boo
 	if err != nil {
 		return nil, err
 	}
+
+	bucketExists, err := minioClient.BucketExists(ctx, bucketName)
+	if err != nil {
+		return nil, err
+	}
+
+	if !bucketExists {
+		err = minioClient.MakeBucket(ctx, bucketName, minio.MakeBucketOptions{})
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return &minioStore{
 		client: minioClient,
 	}, nil
@@ -36,7 +49,9 @@ func New(endpoint string, accessKeyID string, secretAccessKey string, useSSL boo
 
 func (s *minioStore) Get(ctx context.Context, key Key, timestamp uint64) (Value, error) {
 
-	for objectInfo := range s.listObjectsKeys(ctx, key, timestamp){
+	s.client.MakeBucket(ctx, bucketName, minio.MakeBucketOptions{})
+
+	for objectInfo := range s.listObjectsKeys(ctx, key, timestamp) {
 		if objectInfo.Err != nil {
 			fmt.Println(objectInfo.Err)
 			return nil, objectInfo.Err
@@ -54,25 +69,47 @@ func (s *minioStore) Get(ctx context.Context, key Key, timestamp uint64) (Value,
 			fmt.Println(err)
 			return nil, err
 		}
-		return buf[:n], err
+		return buf[:n], nil
 	}
 
 	return nil, nil
 }
 
 func (s *minioStore) BatchGet(ctx context.Context, keys []Key, timestamp uint64) ([]Value, error) {
-	var values []Value
 
-	for i := 0; i < len(keys); i++ {
-		object, err := s.Get(ctx, keys[i], timestamp)
-		if err != nil && err != io.EOF {
-			fmt.Println(err)
-			values = append(values, nil)
-			return nil, err
-		} else {
-			values = append(values, object)
+	errCh := make(chan error)
+	valueLenth := len(keys)
+	values := make([]Value, valueLenth)
+	f := func(ctx context.Context, keys []Key, values []Value, timestamp uint64) {
+		for i := 0; i < len(keys); i++ {
+			value, err := s.Get(ctx, keys[i], timestamp)
+			values[i] = value
+			errCh <- err
 		}
 	}
+
+	maxThread := 500
+	batchSize := 10
+	if len(keys) / batchSize > maxThread {
+		batchSize = len(keys) / maxThread
+	}
+	for i := 0; i < len(keys)/batchSize + 1; i++ {
+		j := i
+		go func() {
+			start, end := j*batchSize, (j+1)*batchSize
+			if len(keys) < end {
+				end = len(keys)
+			}
+			f(ctx, keys[start:end], values, timestamp)
+		}()
+	}
+
+	for i := 0; i < len(keys); i++ {
+		if err := <- errCh; err != nil {
+			return values, err
+		}
+	}
+
 
 	return values, nil
 }
@@ -81,21 +118,42 @@ func (s *minioStore) Set(ctx context.Context, key Key, v Value, timestamp uint64
 	minioKey := codec.MvccEncode(key, timestamp)
 
 	reader := bytes.NewReader(v)
-	uploadInfo, err := s.client.PutObject(ctx, bucketName, minioKey, reader, int64(len(v)), minio.PutObjectOptions{})
+	_, err := s.client.PutObject(ctx, bucketName, minioKey, reader, int64(len(v)), minio.PutObjectOptions{})
 
 	if err != nil {
 		return err
 	}
 
-	fmt.Println(uploadInfo)
 	return err
 }
 
 func (s *minioStore) BatchSet(ctx context.Context, keys []Key, values []Value, timestamp uint64) error {
 
+	errCh := make(chan error)
+	f := func(ctx context.Context, keys []Key, values []Value, timestamp uint64) {
+		for i := 0; i < len(keys); i++ {
+			errCh <- s.Set(ctx, keys[i], values[i], timestamp)
+		}
+	}
+
+	maxThread := 500
+	batchSize := 10
+	if len(keys) / batchSize > maxThread {
+		batchSize = len(keys) / maxThread
+	}
+	for i := 0; i < len(keys)/batchSize + 1; i++ {
+		j := i
+		go func() {
+			start, end := j*batchSize, (j+1)*batchSize
+			if len(keys) < end {
+				end = len(keys)
+			}
+			f(ctx, keys[start:end], values[start:end], timestamp)
+		}()
+	}
+
 	for i := 0; i < len(keys); i++ {
-		err := s.Set(ctx, keys[i], values[i], timestamp)
-		if err != nil {
+		if err := <- errCh; err != nil {
 			return err
 		}
 	}
@@ -145,7 +203,7 @@ func (s *minioStore) listObjectsKeys(ctx context.Context, key Key, timestamp uin
 
 	go func() {
 		defer close(objectsCh)
-		for object := range s.client.ListObjects(ctx, bucketName, minio.ListObjectsOptions{Prefix: string(key)}){
+		for object := range s.client.ListObjects(ctx, bucketName, minio.ListObjectsOptions{Prefix: string(key)}) {
 			if object.Err != nil {
 				fmt.Println(object.Err)
 				objectsCh <- minio.ObjectInfo{

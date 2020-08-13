@@ -16,7 +16,7 @@ var accessKeyID = "testminio"
 var secretAccessKey = "testminio"
 var useSSL = false
 var ctx = context.Background()
-var client, err = minio.New(endPoint, accessKeyID, secretAccessKey, useSSL)
+var client, err = minio.New(ctx, endPoint, accessKeyID, secretAccessKey, useSSL)
 
 func TestSet(t *testing.T) {
 	err = client.Set(ctx, []byte("bar"), []byte("abcdefghijklmnoopqrstuvwxyz"), 1234567)

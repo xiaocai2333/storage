@@ -1,0 +1,60 @@
+Thu, 13 Aug 2020 16:31:11 GMT: Parameters: bucket=zilliz-hz01, duration=1, threads=1, size=1M
+Thu, 13 Aug 2020 16:34:02 GMT: Parameters: bucket=zilliz-hz01, duration=1, threads=1, size=1M
+Thu, 13 Aug 2020 16:34:03 GMT: PUT time 1.0 secs, objects = 50, speed = 49.4MB/sec, 49.4 operations/sec. Slowdowns = 0
+Thu, 13 Aug 2020 16:36:55 GMT: Parameters: bucket=zilliz-hz01, duration=1, threads=1, size=0.001K
+Thu, 13 Aug 2020 16:36:56 GMT: PUT time 1.0 secs, objects = 77, speed = 76BB/sec, 76.8 operations/sec. Slowdowns = 0
+Thu, 13 Aug 2020 16:37:22 GMT: Parameters: bucket=zilliz-hz01, duration=10, threads=1, size=0.001K
+Thu, 13 Aug 2020 16:37:32 GMT: PUT time 10.0 secs, objects = 826, speed = 82BB/sec, 82.6 operations/sec. Slowdowns = 0
+Thu, 13 Aug 2020 16:37:50 GMT: Parameters: bucket=zilliz-hz01, duration=10, threads=1, size=0.01K
+Thu, 13 Aug 2020 16:38:00 GMT: PUT time 10.0 secs, objects = 788, speed = 787BB/sec, 78.7 operations/sec. Slowdowns = 0
+Thu, 13 Aug 2020 16:38:20 GMT: Parameters: bucket=zilliz-hz01, duration=10, threads=1, size=1K
+Thu, 13 Aug 2020 16:38:30 GMT: PUT time 10.0 secs, objects = 789, speed = 78.9KB/sec, 78.9 operations/sec. Slowdowns = 0
+Thu, 13 Aug 2020 16:38:42 GMT: Parameters: bucket=zilliz-hz01, duration=10, threads=1, size=1M
+Thu, 13 Aug 2020 16:38:52 GMT: PUT time 10.0 secs, objects = 571, speed = 57.1MB/sec, 57.1 operations/sec. Slowdowns = 0
+Thu, 13 Aug 2020 16:39:09 GMT: Parameters: bucket=zilliz-hz01, duration=10, threads=1, size=4K
+Thu, 13 Aug 2020 16:39:19 GMT: PUT time 10.0 secs, objects = 818, speed = 327KB/sec, 81.7 operations/sec. Slowdowns = 0
+Thu, 13 Aug 2020 16:39:30 GMT: Parameters: bucket=zilliz-hz01, duration=10, threads=1, size=1M
+Thu, 13 Aug 2020 16:39:40 GMT: PUT time 10.0 secs, objects = 391, speed = 39.1MB/sec, 39.1 operations/sec. Slowdowns = 0
+Thu, 13 Aug 2020 16:40:22 GMT: Parameters: bucket=zilliz-hz01, duration=10, threads=100, size=1M
+Thu, 13 Aug 2020 16:40:33 GMT: PUT time 10.9 secs, objects = 5375, speed = 492.4MB/sec, 492.4 operations/sec. Slowdowns = 0
+Thu, 13 Aug 2020 16:40:48 GMT: Parameters: bucket=zilliz-hz01, duration=10, threads=100, size=4K
+Thu, 13 Aug 2020 16:40:58 GMT: PUT time 10.0 secs, objects = 23418, speed = 9.1MB/sec, 2330.9 operations/sec. Slowdowns = 0
+Thu, 13 Aug 2020 16:41:23 GMT: Parameters: bucket=zilliz-hz01, duration=10, threads=100, size=0.01K
+Thu, 13 Aug 2020 16:41:33 GMT: PUT time 10.1 secs, objects = 42495, speed = 41.2KB/sec, 4218.7 operations/sec. Slowdowns = 0
+Thu, 13 Aug 2020 16:42:08 GMT: Parameters: bucket=zilliz-hz01, duration=10, threads=1000000, size=0.01K
+Thu, 13 Aug 2020 16:42:29 GMT: Parameters: bucket=zilliz-hz01, duration=10, threads=100000, size=0.01K
+Thu, 13 Aug 2020 16:44:02 GMT: Parameters: bucket=zilliz-hz01, duration=10, threads=300, size=0.01K
+Thu, 13 Aug 2020 16:47:20 GMT: Parameters: bucket=zilliz-hz01, duration=10, threads=300, size=0.01K
+Thu, 13 Aug 2020 16:47:30 GMT: PUT time 10.0 secs, objects = 55575, speed = 54.1KB/sec, 5540.1 operations/sec. Slowdowns = 0
+Thu, 13 Aug 2020 16:50:44 GMT: Parameters: bucket=zilliz-hz01, duration=10, threads=339, size=0.01K
+Thu, 13 Aug 2020 16:50:54 GMT: PUT time 10.1 secs, objects = 48834, speed = 47.2KB/sec, 4832.6 operations/sec. Slowdowns = 0
+Thu, 13 Aug 2020 17:02:56 GMT: Parameters: bucket=zilliz-hz01, duration=18, threads=10, size=0.01K
+Thu, 13 Aug 2020 17:03:14 GMT: PUT time 18.0 secs, objects = 12062, speed = 6.5KB/sec, 669.7 operations/sec. Slowdowns = 0
+Thu, 13 Aug 2020 17:04:18 GMT: Parameters: bucket=zilliz-hz01, duration=18, threads=10, size=0.01K
+Thu, 13 Aug 2020 17:04:36 GMT: PUT time 18.0 secs, objects = 10561, speed = 5.7KB/sec, 586.3 operations/sec. Slowdowns = 0
+Thu, 13 Aug 2020 17:27:34 GMT: Parameters: bucket=zilliz-hz01, duration=5, threads=1000, size=0.01K
+Thu, 13 Aug 2020 17:27:39 GMT: PUT time 5.1 secs, objects = 39945, speed = 76.8KB/sec, 7861.7 operations/sec. Slowdowns = 0
+Thu, 13 Aug 2020 17:28:17 GMT: Parameters: bucket=zilliz-hz01, duration=5, threads=2000, size=0.01K
+Thu, 13 Aug 2020 17:28:22 GMT: PUT time 5.2 secs, objects = 39928, speed = 75.7KB/sec, 7751.7 operations/sec. Slowdowns = 0
+Thu, 13 Aug 2020 17:28:37 GMT: Parameters: bucket=zilliz-hz01, duration=5, threads=900, size=0.01K
+Thu, 13 Aug 2020 17:28:42 GMT: PUT time 5.1 secs, objects = 37302, speed = 71.7KB/sec, 7337.1 operations/sec. Slowdowns = 0
+Thu, 13 Aug 2020 17:28:55 GMT: Parameters: bucket=zilliz-hz01, duration=5, threads=1000, size=0.01K
+Thu, 13 Aug 2020 17:29:00 GMT: PUT time 5.1 secs, objects = 38816, speed = 74.5KB/sec, 7629.6 operations/sec. Slowdowns = 0
+Thu, 13 Aug 2020 17:34:22 GMT: Parameters: bucket=zilliz-hz01, duration=5, threads=500, size=0.01K
+Thu, 13 Aug 2020 17:34:27 GMT: PUT time 5.0 secs, objects = 38435, speed = 74.4KB/sec, 7615.6 operations/sec. Slowdowns = 0
+Thu, 13 Aug 2020 17:34:44 GMT: Parameters: bucket=zilliz-hz01, duration=5, threads=100, size=0.01K
+Thu, 13 Aug 2020 17:34:49 GMT: PUT time 5.0 secs, objects = 13700, speed = 26.6KB/sec, 2727.4 operations/sec. Slowdowns = 0
+Thu, 13 Aug 2020 17:34:57 GMT: Parameters: bucket=zilliz-hz01, duration=5, threads=200, size=0.01K
+Thu, 13 Aug 2020 17:35:02 GMT: PUT time 5.1 secs, objects = 19020, speed = 36.7KB/sec, 3758.4 operations/sec. Slowdowns = 0
+Thu, 13 Aug 2020 17:35:09 GMT: Parameters: bucket=zilliz-hz01, duration=5, threads=300, size=0.01K
+Thu, 13 Aug 2020 17:35:14 GMT: PUT time 5.2 secs, objects = 20221, speed = 38KB/sec, 3894.4 operations/sec. Slowdowns = 0
+Thu, 13 Aug 2020 17:35:21 GMT: Parameters: bucket=zilliz-hz01, duration=5, threads=400, size=0.01K
+Thu, 13 Aug 2020 17:35:26 GMT: PUT time 5.0 secs, objects = 25969, speed = 50.4KB/sec, 5160.1 operations/sec. Slowdowns = 0
+Thu, 13 Aug 2020 17:35:33 GMT: Parameters: bucket=zilliz-hz01, duration=5, threads=500, size=0.01K
+Thu, 13 Aug 2020 17:35:38 GMT: PUT time 5.0 secs, objects = 36698, speed = 71.2KB/sec, 7290.7 operations/sec. Slowdowns = 0
+Thu, 13 Aug 2020 17:35:43 GMT: Parameters: bucket=zilliz-hz01, duration=5, threads=500, size=0.01K
+Thu, 13 Aug 2020 17:35:48 GMT: PUT time 5.0 secs, objects = 32697, speed = 63.4KB/sec, 6494.9 operations/sec. Slowdowns = 0
+Thu, 13 Aug 2020 17:58:38 GMT: Parameters: bucket=zilliz-hz01, duration=1, threads=500, size=0.01K
+Thu, 13 Aug 2020 17:58:39 GMT: PUT time 1.0 secs, objects = 7926, speed = 74.5KB/sec, 7630.4 operations/sec. Slowdowns = 0
+Thu, 13 Aug 2020 18:00:12 GMT: Parameters: bucket=zilliz-hz01, duration=2, threads=500, size=0.01K
+Thu, 13 Aug 2020 18:00:14 GMT: PUT time 2.0 secs, objects = 16050, speed = 77.2KB/sec, 7903.2 operations/sec. Slowdowns = 0
